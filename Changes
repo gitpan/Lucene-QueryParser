@@ -1,5 +1,8 @@
 Revision history for Perl extension Lucene::QueryParser.
 
+1.1   Tue Jan 14 13:57:15 GMT 2003
+    - Add deparse() method
+
 0.01  Tue Jan  7 10:13:44 2003
 	- original version; created by h2xs 1.22 with options
 		-b 5.5.3 -AX -n Lucene::QueryParser

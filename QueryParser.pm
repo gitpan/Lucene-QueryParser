@@ -10,9 +10,9 @@ use Text::Balanced qw(extract_bracketed extract_delimited);
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 @ISA = qw(Exporter);
 $Parse::RecDescent::skip = '';
-@EXPORT_OK = qw( parse_query );
-@EXPORT = qw( parse_query );
-$VERSION = '1.00';
+@EXPORT_OK = qw( parse_query deparse_query );
+@EXPORT = qw( parse_query deparse_query );
+$VERSION = '1.01';
 
 sub parse_query {
     local $_ = shift;
@@ -60,6 +60,31 @@ sub parse_query {
     return \@rv;
 }
 
+sub deparse_query {
+    my $ds = shift;
+    my @out; 
+    for my $elem (@$ds) {
+        my $thing = "";
+        if ($elem->{type} eq "REQUIRED") {
+            $thing .= "+";
+        } elsif ($elem->{type} eq "PROHIBITED") {
+            $thing .= "-";
+        }
+        if (exists $elem->{field}) { 
+            $thing .= $elem->{field}.":"
+        }
+        if ($elem->{query} eq "TERM") {
+            $thing .= $elem->{term};
+        } elsif ($elem->{query} eq "SUBQUERY") {
+            $thing .= "(".deparse_query($elem->{subquery}).")";
+        } elsif ($elem->{query} eq "PHRASE") {
+            $thing .= '"'.$elem->{term}.'"';
+        }
+        if (exists $elem->{boost}) { $thing .= "^".$elem->{boost} }
+        push @out, $thing;
+    }
+    return join " ", @out;
+}
 1;
 __END__
 # Below is stub documentation for your module. You'd better edit it!
@@ -93,9 +118,13 @@ It deals with fields, types, phrases, subqueries, and so on; everything
 handled by the C<SimpleQuery> class in Lucene. The data structure is similar
 to the one given above, and is pretty self-explanatory.
 
+The other function, C<deparse_query> turns such a data structure back into
+a Lucene query string. This is useful if you've just been mucking about
+with the data.
+
 =head2 EXPORT
 
-Exports the C<parse_query> function.
+Exports the C<parse_query> and C<deparse_query> functions.
 
 =head1 AUTHOR
 
