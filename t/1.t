@@ -52,32 +52,32 @@ is_deeply(parse_query('"foo bar" baz'),
  ],
     "Quoted phrase matches work");
 
-test_query("foo and bar",
+test_query("foo AND bar",
 [ { query => 'TERM', type => 'NORMAL', term => 'foo' },
-  { query => 'TERM', type => 'NORMAL', term => 'bar' },
+  { query => 'TERM', type => 'NORMAL', term => 'bar' , conj => "AND" },
  ],
     "conjunctions work");
 
-test_query("foo and baz:bar",
+test_query("foo AND baz:bar",
 [ { query => 'TERM', type => 'NORMAL', term => 'foo' },
-  { query => 'TERM', type => 'NORMAL', term => 'bar', field => 'baz' },
+  { query => 'TERM', type => 'NORMAL', term => 'bar', field => 'baz' , conj => "AND" },
  ],
     "fields work");
 
-test_query("foo and baz^2.0",
-[ { query => 'TERM', type => 'NORMAL', term => 'foo' },
-  { query => 'TERM', type => 'NORMAL', term => 'baz', boost => "2.0" },
+test_query("foo AND baz^2.0",
+[ { query => 'TERM', type => 'NORMAL', term => 'foo'},
+  { query => 'TERM', type => 'NORMAL', term => 'baz', boost => "2.0", conj => "AND" },
  ],
     "boosting works");
 
 # Grand finale!
 
-test_query("red and yellow and -(coat:pink and green)",
+test_query("red AND yellow AND -(coat:pink AND green)",
 [ { query => 'TERM', type => 'NORMAL', term => 'red' },
-  { query => 'TERM', type => 'NORMAL', term => 'yellow' },
+  { query => 'TERM', type => 'NORMAL', term => 'yellow', conj => "AND" },
   { subquery => [
         { query => 'TERM', type => 'NORMAL', term => 'pink', field => 'coat' },
-        { query => 'TERM', type => 'NORMAL', term => 'green' } 
-    ], query => 'SUBQUERY', type => 'PROHIBITED' }
+        { query => 'TERM', type => 'NORMAL', term => 'green', conj => "AND" } 
+    ], query => 'SUBQUERY', type => 'PROHIBITED', conj => "AND" }
 ], "A very complex query (with subquery)");
 

@@ -9,10 +9,9 @@ use Text::Balanced qw(extract_bracketed extract_delimited);
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 @ISA = qw(Exporter);
-$Parse::RecDescent::skip = '';
 @EXPORT_OK = qw( parse_query deparse_query );
 @EXPORT = qw( parse_query deparse_query );
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 sub parse_query {
     local $_ = shift;
@@ -20,6 +19,8 @@ sub parse_query {
     while ($_) {
         s/^\s+// and next;
         my $item;
+        s/^(AND|OR|\|\|)\s+//;
+        if ($1)                   { $item->{conj} = $1; }
         if (s/^\+//)              { $item->{type} = "REQUIRED";   }
         elsif (s/^(-|!|NOT)\s*//i){ $item->{type} = "PROHIBITED"; }
         else                      { $item->{type} = "NORMAL";     }
@@ -54,7 +55,6 @@ sub parse_query {
 
         if (s/^\^(\d+(?:.\d+))//)  { $item->{boost} = $1 }
 
-        s/\s+(AND|OR|\|\|)//i;
         push @rv, $item;
     }
     return \@rv;
@@ -65,6 +65,7 @@ sub deparse_query {
     my @out; 
     for my $elem (@$ds) {
         my $thing = "";
+        if ($elem->{conj}) { $thing .= "$elem->{conj} "; }
         if ($elem->{type} eq "REQUIRED") {
             $thing .= "+";
         } elsif ($elem->{type} eq "PROHIBITED") {
