@@ -4,3 +4,4 @@ MANIFEST
 QueryParser.pm
 README
 t/1.t
+t/2.t

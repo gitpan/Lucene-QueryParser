@@ -8,6 +8,7 @@
 use Test::More tests => 20;
 
 use_ok("Lucene::QueryParser");
+Lucene::QueryParser->import; # Devel::Cover seems to screw this over.
 
 use Data::Dumper;
 
