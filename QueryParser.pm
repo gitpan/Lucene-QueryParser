@@ -11,7 +11,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 @ISA = qw(Exporter);
 @EXPORT_OK = qw( parse_query deparse_query );
 @EXPORT = qw( parse_query deparse_query );
-$VERSION = '1.03';
+$VERSION = '1.04';
 
 sub parse_query {
     local $_ = shift;
@@ -91,6 +91,8 @@ package Lucene::QueryParser::TopLevel;
 
 sub to_plucene {
     my ($self, $field) = @_;
+    Carp::croak("You need to specify a default field for your query")
+        unless $field;
     return $self->[0]->to_plucene($field) 
         if @$self ==1 and $self->[0]->{type} eq "NORMAL";
 
